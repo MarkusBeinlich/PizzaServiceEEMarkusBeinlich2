@@ -1,0 +1,71 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:h="http://xmlns.jcp.org/jsf/html">
+    <h:head>
+        <title>Facelet Title</title>
+    </h:head>
+    <h:body>
+        <f:view contracts="#{view.locale.language}">
+            <ui:composition template="/template.xhtml">
+                <ui:define name="content">
+                    <h2>#{msg.customerHeader}</h2>
+
+                    <h:form>
+
+                        <p:panelGrid id="customerGrid" columns="3" layout="grid">
+                            <p:outputLabel for="inFirstName" value="#{msg.customerFirstName}" />    
+                            <p:inputText  id="inFirstName" value="#{orderPizza.customer.firstName}" 
+                                          required="true" converter="trimconverter"
+                                          requiredMessage="Vorname ist ein Pflichtfeld.">
+                                <f:validateLength minimum="2" maximum="50"/>
+                            </p:inputText>
+                            <p:message for="inFirstName" />
+                            <p:outputLabel for="inLastName" value="#{msg.customerLastName}" />    
+                            <p:inputText id="inLastName" value="#{orderPizza.customer.lastName}" required="true" 
+                                         converter="trimconverter" requiredMessage="Nachname ist ein Pflichtfeld.">
+                                <f:validateLength minimum="2" maximum="50"/>
+                            </p:inputText>
+                            <p:message for="inLastName" />
+                            <p:outputLabel for="inEmail" value="#{msg.customerEmail}" />    
+                            <p:inputText id="inEmail" value="#{orderPizza.customer.email}" required="true"
+                                         requiredMessage="Email ist ein Pflichtfeld." validatorMessage="Email muß ein @-Zeichen enthalten."> 
+                                <f:validateRegex pattern=".+@.+" for="inEmail" />
+                            </p:inputText>
+                            <p:message for="inEmail" />
+                            <p:outputLabel for="inPhone" value="#{msg.customerPhone}" />    
+                            <p:inputText id="inPhone" value="#{orderPizza.customer.phone}" required="true" 
+                                         converter="trimconverter" requiredMessage="Telefonnummer ist ein Pflichtfeld.">
+                                <f:validateLength minimum="5" maximum="20"/>
+                            </p:inputText>
+                            <p:message for="inPhone" />
+                            <p:outputLabel for="inStreet" value="#{msg.customerStreet}" />    
+                            <p:inputText id="inStreet" value="#{orderPizza.customer.street}" required="true" 
+                                         converter="trimconverter" requiredMessage="Straße ist ein Pflichtfeld.">
+                                <f:validateLength minimum="2" maximum="50"/>
+                            </p:inputText>
+                            <p:message for="inStreet" />
+                            <p:outputLabel for="inTown" value="#{msg.customerTown}" />    
+                            <p:inputText id="inTown" value="#{orderPizza.customer.town}" required="true" 
+                                         converter="trimconverter" requiredMessage="Stadt ist ein Pflichtfeld.">
+                                <f:validateLength minimum="2" maximum="50"/>
+                            </p:inputText>
+                            <p:message for="inTown" />
+                            <p:outputLabel for="inPostcode" value="#{msg.customerPostcode}" />    
+                            <p:inputText id="inPostcode" value="#{orderPizza.customer.postcode}" required="true" 
+                                         converter="trimconverter" requiredMessage="Nachname ist ein Pflichtfeld.">
+                                <f:validateLength minimum="4" maximum="8"/>
+                            </p:inputText>
+                            <p:message for="inPostcode" />
+                        </p:panelGrid>
+                        <br/>
+                        <p:commandButton action="#{orderPizza.customerEntered()}" value="#{msg.customerButtonNext}" update="customerGrid" />
+                    </h:form>
+                </ui:define>
+            </ui:composition>
+        </f:view>
+    </h:body>
+</html>

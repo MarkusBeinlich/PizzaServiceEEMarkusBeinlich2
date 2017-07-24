@@ -1,0 +1,89 @@
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:h="http://xmlns.jcp.org/jsf/html">
+    <h:head>
+        <title>Facelet Title</title>
+    </h:head>
+    <h:body>
+        <f:view contracts="#{view.locale.language}">
+            <ui:composition template="/template.xhtml">
+                <ui:define name="content">
+                    <h2>#{msg.confirmationCustomer}</h2>
+                    <p:panelGrid id="customerGrid" columns="2" layout="grid">
+                        <p:outputLabel for="outFirstName" value="Vorname:" />    
+                        <h:outputText  id="outFirstName" value="#{orderPizza.customer.firstName}"/> 
+                        <p:outputLabel for="outLastName" value="Nachname:" />    
+                        <h:outputText id="outLastName" value="#{orderPizza.customer.lastName}"/>
+                        <p:outputLabel for="outEmail" value="Email:" />    
+                        <h:outputText id="outEmail" value="#{orderPizza.customer.email}" />
+                        <p:outputLabel for="outPhone" value="Telefonnummer:" />    
+                        <h:outputText id="outPhone" value="#{orderPizza.customer.phone}" />
+                        <p:outputLabel for="outStreet" value="Straße:" />    
+                        <h:outputText id="outStreet" value="#{orderPizza.customer.street}" />
+                        <p:outputLabel for="outTown" value="Stadt:" />    
+                        <h:outputText id="outTown" value="#{orderPizza.customer.town}" />
+                        <p:outputLabel for="outPostcode" value="Postleitzahl:" />    
+                        <h:outputText id="outPostcode" value="#{orderPizza.customer.postcode}" />
+                    </p:panelGrid>
+                    <h:form>
+
+                        <h2>#{msg.confirmationOrder}</h2>
+                        <p:dataTable id="order" value="#{orderPizza.order.orderEntriesAsCollection}" var="orderEntry">
+
+                            <p:column>
+                                 <f:facet name="header">
+                                    <h:outputLabel value="#{msg.menuItemName}"/>
+                                </f:facet>
+                                <h:outputText value="#{orderEntry.name}"/>
+                            </p:column>
+                            <p:column>
+                                 <f:facet name="header">
+                                    <h:outputLabel value="#{msg.menuItemDescription}"/>
+                                </f:facet>
+                                <h:outputText value="#{orderEntry.description}"/>
+                            </p:column>
+                            <p:column>
+                                <f:facet name="header">
+                                    <h:outputLabel value="#{msg.menuItemQuantity}"/>
+                                 </f:facet>
+                                <h:outputText value="#{orderEntry.quantity}"/>
+                            </p:column>
+                            <p:column>
+                                <f:facet name="header">
+                                    <h:outputLabel value="#{msg.menuItemPrice}"/>
+                                </f:facet>
+                                <h:outputText value="#{orderEntry.amount}">
+                                    <f:convertNumber type="currency" currencySymbol="€"/>
+                                </h:outputText>
+                                <f:facet name="footer">
+                                    <h:outputText value="#{orderPizza.order.amount}">
+                                        <f:convertNumber type="currency" currencySymbol="€"/>
+                                    </h:outputText>
+                                </f:facet>
+                            </p:column>
+                        </p:dataTable>
+                        <p:outputLabel value="#{msg.confirmationPdfLabel}" />
+                        <p:commandButton action="#{orderPizza.showPdf()}" 
+                                         value="#{msg.confirmationPdfButtonLabel}" />
+                        <br />
+                        <p:outputLabel value="#{msg.confirmationSubmitted}" rendered="#{orderPizza.submitted}" />
+                        <h:panelGroup id="submitted">
+                            <p:outputLabel value="#{msg.confirmationSubmitOrderLabel}" 
+                                           rendered="#{!orderPizza.submitted}" />
+                            <br />
+                            <p:commandButton actionListener="#{orderPizza.submitOrder()}" 
+                                             value="#{msg.confirmationSubmitOrder}" 
+                                             rendered="#{!orderPizza.submitted}" 
+                                             update="submitted"/>
+                            <p:outputLabel value="#{msg.confirmationSubmitted}" rendered="#{orderPizza.submitted}" />
+                        </h:panelGroup>
+                    </h:form>
+                </ui:define>
+            </ui:composition>
+        </f:view>
+    </h:body>
+</html>

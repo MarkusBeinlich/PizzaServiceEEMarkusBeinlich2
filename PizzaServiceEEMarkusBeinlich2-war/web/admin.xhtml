@@ -1,0 +1,50 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets" 
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:h="http://xmlns.jcp.org/jsf/html">
+
+    <h:head>
+        <title>#{msg.header}</title> 
+    </h:head>
+    <h:body>
+        <f:view contracts="#{view.locale.language}">
+            <ui:composition template="/template.xhtml">
+                <ui:define name="content">
+                    <h2>Active Sessions</h2>
+
+                    <h:form>
+                        <p:dataTable value="#{orderPizza.activeSessionsAsCollection}" var="sess">
+
+                            <p:column>
+                                <f:facet name="header">
+                                    <h:outputLabel value="Session-Id"/>
+                                </f:facet>
+                                <h:outputText value="#{sess.id}"/>
+                            </p:column>
+                            <p:column>
+                                <f:facet name="header">
+                                    <h:outputLabel value="Creation Time"/>
+                                </f:facet>
+                                <h:outputText value="#{sess.creationTime}">
+                                    <f:convertDateTime type="both" />
+                                </h:outputText>
+                            </p:column>
+                            <p:column>
+                                <f:facet name="header">
+                                    <h:outputLabel value="Last Accessed Time"/>
+                                </f:facet>
+                                <h:outputText value="#{sess.lastAccessedTime}">
+                                    <f:convertDateTime type="both" />
+                                </h:outputText>
+                            </p:column>
+
+                        </p:dataTable>
+                        <p:commandButton action="#{orderPizza.initMenu()}" 
+                                         value="Menu initialisieren" />
+                    </h:form>
+                </ui:define>
+            </ui:composition>
+        </f:view>
+    </h:body>
+</html>
