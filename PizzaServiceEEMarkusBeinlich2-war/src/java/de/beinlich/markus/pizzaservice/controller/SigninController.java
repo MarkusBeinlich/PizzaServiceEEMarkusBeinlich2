@@ -85,23 +85,23 @@ public class SigninController implements Serializable{
     public void login() {
 
         RequestContext context = RequestContext.getCurrentInstance();
-        FacesMessage message = null;
-        boolean loggedIn = false;
+        FacesMessage facesMessage = null;
         System.out.println("login with " + cust.getEmail() + cust.getPassword());
         loggedIn = false;
-        message = new FacesMessage(FacesMessage.SEVERITY_WARN, "Loggin Error", "Invalid credentials");
+        facesMessage = new FacesMessage(FacesMessage.SEVERITY_WARN, "Loggin Error", "Invalid credentials");
         try {
             HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
             request.login(cust.getEmail(), cust.getPassword());
             loggedIn = true;
             username = cust.getEmail();
-            message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Welcome", cust.getEmail());
+            facesMessage = new FacesMessage(FacesMessage.SEVERITY_INFO, "Welcome", cust.getEmail());
         } catch (ServletException ex) {
             Logger.getLogger(SigninController.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
-            FacesContext.getCurrentInstance().addMessage(null, message);
+            FacesContext.getCurrentInstance().addMessage(null, facesMessage);
             context.addCallbackParam("loggedIn", loggedIn);
         }
+        System.out.println("IsAdmin: " + isAdmin());
     }
 
     public Boolean getLoggedIn() {

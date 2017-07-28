@@ -1,0 +1,64 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:h="http://xmlns.jcp.org/jsf/html">
+
+    <h:head>
+        <title>#{msg.header}</title>
+    </h:head>
+    <h:body> 
+        <f:view contracts="#{view.locale.language}">
+            <ui:composition template="/template.xhtml">
+                <ui:define name="content">
+                    <h2>#{msg.menu}</h2>
+
+                    <h:form>
+                        <p:dataTable value="#{orderPizza.menu.menuItems}" var="menuItem" editable="true">
+
+                            <p:column headerText="#{msg.menuItemName}">
+                                <p:cellEditor>
+                                    <f:facet name="output">
+                                        <h:outputText value="#{menuItem.name}"/>
+                                    </f:facet>
+                                    <f:facet name="input">
+                                        <h:inputText value="#{menuItem.name}"/>
+                                    </f:facet>
+                                </p:cellEditor>
+                            </p:column>
+                            <p:column headerText="#{msg.menuItemDescription}">
+                                <p:cellEditor>
+                                    <f:facet name="output">
+                                        <h:outputText value="#{menuItem.description}"/>
+                                    </f:facet>
+                                    <f:facet name="input">
+                                        <h:inputText value="#{menuItem.description}"/>
+                                    </f:facet>
+                                </p:cellEditor>
+                            </p:column>
+                            <p:column headerText="#{msg.menuItemPrice}">
+                                <p:cellEditor>
+                                    <f:facet name="output">
+                                        <h:outputText value="#{menuItem.price}">
+                                            <f:convertNumber type="currency" currencySymbol="€"/>
+                                        </h:outputText>
+                                    </f:facet>
+                                    <f:facet name="input">
+                                        <p:inputNumber value="#{menuItem.price}" 
+                                                       decimalPlaces="2">
+                                        </p:inputNumber>
+                                    </f:facet>
+                                </p:cellEditor>
+                            </p:column>
+
+                            <p:column> 
+                                <p:rowEditor />
+                            </p:column>
+                        </p:dataTable>
+
+                    </h:form>
+                </ui:define>
+            </ui:composition>
+        </f:view>
+    </h:body>
+</html>

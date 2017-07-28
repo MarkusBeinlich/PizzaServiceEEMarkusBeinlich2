@@ -12,25 +12,27 @@
         <h:form>  
             <p:growl id="messages"/>
 
-            <p:menubar>
+            <p:menubar id="headerMenu">
                 <p:submenu label="File" icon="ui-icon-document">
                     <p:submenu label="New" icon="ui-icon-contact">
                         <p:menuitem value="Project" url="#" />
-                        <p:menuitem value="Other" url="#" />
+                        <p:menuitem value="Home" url="/" />
                     </p:submenu>
                     <p:menuitem value="Open" url="#" />
                     <p:separator />
                     <p:menuitem value="Quit" url="#" />
                 </p:submenu>
 
-
-
                 <p:menuitem value="Quit" url="http://www.primefaces.org" icon="ui-icon-close" />
-                <p:menuitem value="Admin" rendered="true" url="/admin.xhtml" icon="ui-icon-wrench" />
+                
+                <p:submenu label="Admin" rendered="#{signinController.admin}" icon="ui-icon-wrench">
+                    <p:menuitem value="Sessions" url="/admin/admin.xhtml"  />
+                    <p:menuitem value="Edit Menu" url="/admin/menuEdit.xhtml"  />
+                </p:submenu>
 
-                <p:menuitem value="Hello #{signinController.username}" rendered="true" url="#" />
+                <p:menuitem value="Hello #{signinController.username}" rendered="#{signinController.loggedIn}" url="#" />
                 <f:facet name="options" rendered="true">
-                    <h:outputLink value="javascript:void(0)" onclick="PF('dlg').show();" title="login">
+                    <h:outputLink value="javascript:void(0)" onclick="PF('dlg').show();" title="login" rendered="#{not signinController.loggedIn}">
                         <h:outputText value="Login" />
                     </h:outputLink>
 
@@ -45,8 +47,9 @@
                             <p:password id="password" value="#{signinController.cust.password}" required="true" label="password" />
 
                             <f:facet name="footer">
-                                <p:commandButton value="Login" update="messages" actionListener="#{signinController.login()}"
-                                                 oncomplete="handleLoginRequest(xhr, status, args)" />
+                                <p:commandButton value="Login" update="messages headerMenu" actionListener="#{signinController.login()}"
+                                                 oncomplete="handleLoginRequest(xhr, status, args)" >
+                                </p:commandButton>
                             </f:facet>  
                         </h:panelGrid>
                     </p:dialog>
@@ -56,14 +59,13 @@
         #{msg.templateHeader} 
     </h:body>
     <script type="text/javascript">
-    function handleLoginRequest(xhr, status, args) {
-        if(args.validationFailed || !args.loggedIn) {
-            PF('dlg').jq.effect("shake", {times:5}, 100);
+        function handleLoginRequest(xhr, status, args) {
+            if (args.validationFailed || !args.loggedIn) {
+                PF('dlg').jq.effect("shake", {times: 5}, 100);
+            } else {
+                PF('dlg').hide();
+                $('#loginLink').fadeOut();
+            }
         }
-        else {
-            PF('dlg').hide();
-            $('#loginLink').fadeOut();
-        }
-    }
-</script>
+    </script>
 </html>
