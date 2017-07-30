@@ -34,11 +34,11 @@ public class MenuEjb implements MenuEjbRemote {
 //            EntityManager em = emf.createEntityManager();
             TypedQuery<Menu> query = em.createNamedQuery(Menu.findAll, Menu.class);
             List<Menu> menus = query.getResultList();
-            System.out.println("getMenu1:" + menus.size() + "-" + menu.hashCode() + "-" + menus.get(0).getMenuItems().toString());
+            System.out.println("getMenuEjb1:" + menus.size() + "-" + menu.hashCode() + "-" + menus.get(0).getMenuItems().toString());
             menu = menus.get(0);
             return menu;
         }
-        System.out.println("getMenu2:" + menu.toString());
+        System.out.println("getMenuEjb2:" + menu.toString());
         return menu;
     }
 
@@ -55,4 +55,12 @@ public class MenuEjb implements MenuEjbRemote {
         }
     }
 
+    @Override
+    public Menu updateMenu(Menu menu) {
+        System.out.println("updateMenuEjb");
+        menu = em.merge(menu);
+        return menu;
+    }
 }
+
+

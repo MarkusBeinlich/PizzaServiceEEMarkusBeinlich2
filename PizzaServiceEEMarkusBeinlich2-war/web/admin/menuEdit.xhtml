@@ -14,8 +14,40 @@
                     <h2>#{msg.menu}</h2>
 
                     <h:form>
-                        <p:dataTable value="#{orderPizza.menu.menuItems}" var="menuItem" editable="true">
+                        <p:panelGrid id="addGrid" columns="3" layout="grid">  
+                            <p:outputLabel for="inName" value="#{msg.menuItemName}" /> 
+                            <p:inputText  id="inName" value="#{orderPizza.newMenuItem.name}" 
+                                          required="true" converter="trimconverter"
+                                          requiredMessage="Name ist ein Pflichtfeld.">
+                                <f:validateLength minimum="2" maximum="50"/>
+                            </p:inputText>
+                            <p:message for="inName" />
 
+                            <p:outputLabel for="inDescription" value="#{msg.menuItemDescription}" /> 
+                            <p:inputText id="inDescription" value="#{orderPizza.newMenuItem.description}" required="true" 
+                                         converter="trimconverter" requiredMessage="Beschreibung ist ein Pflichtfeld.">
+                                <f:validateLength minimum="2" maximum="50"/>
+                            </p:inputText>
+                            <p:message for="inDescription" />
+
+                            <p:outputLabel for="inPrice" value="#{msg.menuItemPrice}" /> 
+                            <p:inputNumber id="inPrice" value="#{orderPizza.newMenuItem.price}" required="true" 
+                                           decimalPlaces="2" requiredMessage="Preis ist ein Pflichtfeld.">
+                            </p:inputNumber>
+                            <p:message for="inPrice" />
+                            <f:facet name="footer">
+                                <p:commandButton value="Add" action="#{orderPizza.addMenuItem()}"
+                                                 update="menuTable addGrid"/>
+                            </f:facet> 
+                        </p:panelGrid>
+                        <br/>
+
+                        <p:dataTable id="menuTable" value="#{orderPizza.menu.menuItems}" var="menuItem" 
+                                     editable="true" widgetVar="dt" >
+                            <f:facet name="header">
+                                <p:commandButton value="Save Menu" action="#{orderPizza.updateMenu()}"
+                                                 immediate="true" />
+                            </f:facet>
                             <p:column headerText="#{msg.menuItemName}">
                                 <p:cellEditor>
                                     <f:facet name="output">
@@ -53,8 +85,17 @@
 
                             <p:column> 
                                 <p:rowEditor />
+                                <p:commandLink id="deleteLink" update="menuTable"
+                                               immediate="true"
+                                               action="#{orderPizza.deleteMenuItem()}">
+                                    <h:outputText value="Delete" />
+                                    <f:setPropertyActionListener value="#{menuItem}"
+                                                                 target="#{orderPizza.selectedMenuItem}" />
+                                </p:commandLink>
                             </p:column>
                         </p:dataTable>
+
+
 
                     </h:form>
                 </ui:define>

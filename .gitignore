@@ -1,1 +1,7 @@
 /dist/
+/nbproject/private/
+/PizzaServiceEEMarkusBeinlich2-war/nbproject/private/
+/PizzaServiceEEMarkusBeinlich2-ejb/nbproject/private/
+/PizzaServiceEEMarkusBeinlich2-war/build/
+/PizzaServiceEEMarkusBeinlich2-war/dist/
+/PizzaServiceEEMarkusBeinlich2-ejb/build/

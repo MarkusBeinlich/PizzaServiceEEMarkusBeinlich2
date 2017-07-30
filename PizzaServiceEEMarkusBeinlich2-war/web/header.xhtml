@@ -23,8 +23,6 @@
                     <p:menuitem value="Quit" url="#" />
                 </p:submenu>
 
-                <p:menuitem value="Quit" url="http://www.primefaces.org" icon="ui-icon-close" />
-                
                 <p:submenu label="Admin" rendered="#{signinController.admin}" icon="ui-icon-wrench">
                     <p:menuitem value="Sessions" url="/admin/admin.xhtml"  />
                     <p:menuitem value="Edit Menu" url="/admin/menuEdit.xhtml"  />
@@ -55,8 +53,9 @@
                     </p:dialog>
                 </f:facet>
             </p:menubar>
+
+            #{msg.templateHeader} 
         </h:form>
-        #{msg.templateHeader} 
     </h:body>
     <script type="text/javascript">
         function handleLoginRequest(xhr, status, args) {

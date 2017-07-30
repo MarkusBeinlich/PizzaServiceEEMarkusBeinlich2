@@ -3,7 +3,7 @@ package de.beinlich.markus.pizzaservice.controller;
 import de.beinlich.markus.pizzaservice.ejb.MenuEjbRemote;
 import de.beinlich.markus.pizzaservice.ejb.OrderEjbRemote;
 import de.beinlich.markus.pizzaservice.model.Customer;
-import de.beinlich.markus.pizzaservice.model.Invoice; 
+import de.beinlich.markus.pizzaservice.model.Invoice;
 import de.beinlich.markus.pizzaservice.model.Menu;
 import de.beinlich.markus.pizzaservice.model.MenuItem;
 import de.beinlich.markus.pizzaservice.model.OrderEntry;
@@ -49,6 +49,8 @@ public class OrderPizza implements Serializable {
     private String time;
     private Menu menu;
     private Boolean submitted;
+    private MenuItem newMenuItem;
+    private MenuItem selectedMenuItem;
 
     public OrderPizza() {
 
@@ -62,6 +64,7 @@ public class OrderPizza implements Serializable {
         order = new OrderHeader();
         menu = new Menu();
         submitted = false;
+        newMenuItem = new MenuItem();
     }
 
     private OrderEjbRemote lookupOrderEjbRemote() {
@@ -82,6 +85,12 @@ public class OrderPizza implements Serializable {
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, "exception caught", ne);
             throw new RuntimeException(ne);
         }
+    }
+
+    public void deleteMenuItem() {
+        System.out.println("delete:" + selectedMenuItem.getName());
+        menu.getMenuItems().remove(selectedMenuItem);
+        selectedMenuItem = null;
     }
 
     public void submitOrder() {
@@ -213,6 +222,21 @@ public class OrderPizza implements Serializable {
     public void addMenu() {
         System.out.println("addMenu" + menu.getMenuItems().size());
         menuEjb.addMenu(menu);
+        showMessage("Die Speisekarte wurde gespeichert.");
+    }
+
+    public void updateMenu() {
+        System.out.println("updateMenu" + menu.getMenuItems().size());
+        menu = menuEjb.updateMenu(menu);
+        showMessage("Die Speisekarte wurde gespeichert.");
+    }
+
+    public void addMenuItem() {
+        System.out.println("addMenuItem:" + newMenuItem.getName());
+        newMenuItem.setMenuItemId(menu.getMenuItems().get(menu.getMenuItems().size() - 1).getMenuItemId() + 1);
+        newMenuItem.setMenu(menu);
+        menu.getMenuItems().add(newMenuItem);
+        newMenuItem = new MenuItem();
     }
 
     public String initMenu() {
@@ -258,4 +282,25 @@ public class OrderPizza implements Serializable {
         return sessions;
     }
 
+    public MenuItem getNewMenuItem() {
+        return newMenuItem;
+    }
+
+    public void setNewMenuItem(MenuItem newMenuItem) {
+        this.newMenuItem = newMenuItem;
+    }
+
+    public MenuItem getSelectedMenuItem() {
+        return selectedMenuItem;
+    }
+
+    public void setSelectedMenuItem(MenuItem selectedMenuItem) {
+        this.selectedMenuItem = selectedMenuItem;
+    }
+
+    public void showMessage(String text) {
+        FacesMessage message = new FacesMessage(text);
+
+        RequestContext.getCurrentInstance().showMessageInDialog(message);
+    }
 }
