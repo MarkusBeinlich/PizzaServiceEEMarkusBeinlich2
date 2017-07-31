@@ -1,5 +1,6 @@
 package de.beinlich.markus.pizzaservice.controller;
 
+import de.beinlich.markus.pizzaservice.ejb.CustomerEjbRemote;
 import de.beinlich.markus.pizzaservice.ejb.MenuEjbRemote;
 import de.beinlich.markus.pizzaservice.ejb.OrderEjbRemote;
 import de.beinlich.markus.pizzaservice.model.Customer;
@@ -37,6 +38,8 @@ import org.primefaces.context.RequestContext;
 @SessionScoped
 public class OrderPizza implements Serializable {
 
+    private final CustomerEjbRemote customerEjb = lookupCustomerEjbRemote();
+
     private final OrderEjbRemote orderEjb = lookupOrderEjbRemote();
 
     private final MenuEjbRemote menuEjb = lookupMenuEjbRemote();
@@ -51,6 +54,7 @@ public class OrderPizza implements Serializable {
     private Boolean submitted;
     private MenuItem newMenuItem;
     private MenuItem selectedMenuItem;
+    private Boolean customerSave;
 
     public OrderPizza() {
 
@@ -65,6 +69,16 @@ public class OrderPizza implements Serializable {
         menu = new Menu();
         submitted = false;
         newMenuItem = new MenuItem();
+    }
+
+    private CustomerEjbRemote lookupCustomerEjbRemote() {
+        try {
+            Context c = new InitialContext();
+            return (CustomerEjbRemote) c.lookup("ejb/customerEjb");
+        } catch (NamingException ne) {
+            Logger.getLogger(getClass().getName()).log(Level.SEVERE, "exception caught", ne);
+            throw new RuntimeException(ne);
+        }
     }
 
     private OrderEjbRemote lookupOrderEjbRemote() {
@@ -138,7 +152,14 @@ public class OrderPizza implements Serializable {
     }
 
     public String startOrder() {
+        customerSave = Boolean.FALSE;
+        return "toCustomer";
+    }
 
+    public String enterCustomer() {
+        System.out.println("enterCustomer2");
+        customerSave = Boolean.TRUE;
+        this.customer = getCustomerByEmail();
         return "toCustomer";
     }
 
@@ -205,6 +226,15 @@ public class OrderPizza implements Serializable {
 
     public void setTime(String time) {
         this.time = time;
+    }
+
+    public Customer getCustomerByEmail() {
+        HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
+        if (customer == null) {
+            customer = customerEjb.getCustomerByEmail(request.getUserPrincipal().getName());
+        }
+        System.out.println("getCustomer:" + request.getUserPrincipal().getName() + " - " + customer.toString());
+        return customer;
     }
 
     public Menu getMenu() {
@@ -303,4 +333,13 @@ public class OrderPizza implements Serializable {
 
         RequestContext.getCurrentInstance().showMessageInDialog(message);
     }
+
+    public Boolean getCustomerSave() {
+        return customerSave;
+    }
+
+    public void setCustomerSave(Boolean customerSave) {
+        this.customerSave = customerSave;
+    }
+
 }
