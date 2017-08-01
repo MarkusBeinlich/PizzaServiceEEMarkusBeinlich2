@@ -6,6 +6,7 @@
 package de.beinlich.markus.pizzaservice.ejb;
 
 import de.beinlich.markus.pizzaservice.model.Customer;
+import java.util.List;
 import javax.ejb.Stateless;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
@@ -25,8 +26,12 @@ public class CustomerEjb implements CustomerEjbRemote {
     public Customer getCustomerByEmail(String email) {
         TypedQuery<Customer> query = em.createNamedQuery(Customer.findByEmail, Customer.class);
         query.setParameter("email", email);
-        Customer customer = query.getSingleResult();
-        return customer;
+        List<Customer> customers = query.getResultList();
+        if (customers.isEmpty()) {
+            return null;
+        } else {
+            return customers.get(0);
+        }
     }
 
     @Override
