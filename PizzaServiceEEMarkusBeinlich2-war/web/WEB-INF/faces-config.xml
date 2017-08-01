@@ -34,7 +34,7 @@
         </navigation-case>
     
         <navigation-case>
-            <from-outcome>orderSubmitted</from-outcome>
+            <from-outcome>toMenu</from-outcome>
             <to-view-id>/menu.xhtml</to-view-id>
             <redirect/>
         </navigation-case>

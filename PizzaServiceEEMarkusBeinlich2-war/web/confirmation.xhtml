@@ -13,6 +13,7 @@
             <ui:composition template="/template.xhtml">
                 <ui:define name="content">
                     <h2>#{msg.confirmationCustomer}</h2>
+                    <p:link outcome="toCustomer" value="Bearbeiten" rendered="#{orderPizza.submitted}"/>
                     <p:panelGrid id="customerGrid" columns="2" layout="grid">
                         <p:outputLabel for="outFirstName" value="Vorname:" />    
                         <h:outputText  id="outFirstName" value="#{orderPizza.customer.firstName}"/> 
@@ -32,16 +33,17 @@
                     <h:form>
 
                         <h2>#{msg.confirmationOrder}</h2>
+                        <p:link outcome="toMenu" value="Bearbeiten" rendered="#{orderPizza.submitted}"/>
                         <p:dataTable id="order" value="#{orderPizza.order.orderEntriesAsCollection}" var="orderEntry">
 
                             <p:column>
-                                 <f:facet name="header">
+                                <f:facet name="header">
                                     <h:outputLabel value="#{msg.menuItemName}"/>
                                 </f:facet>
                                 <h:outputText value="#{orderEntry.name}"/>
                             </p:column>
                             <p:column>
-                                 <f:facet name="header">
+                                <f:facet name="header">
                                     <h:outputLabel value="#{msg.menuItemDescription}"/>
                                 </f:facet>
                                 <h:outputText value="#{orderEntry.description}"/>
@@ -49,7 +51,7 @@
                             <p:column>
                                 <f:facet name="header">
                                     <h:outputLabel value="#{msg.menuItemQuantity}"/>
-                                 </f:facet>
+                                </f:facet>
                                 <h:outputText value="#{orderEntry.quantity}"/>
                             </p:column>
                             <p:column>

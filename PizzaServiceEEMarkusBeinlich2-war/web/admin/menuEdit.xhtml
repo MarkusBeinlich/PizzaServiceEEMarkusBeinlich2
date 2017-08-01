@@ -87,10 +87,10 @@
                                 <p:rowEditor />
                                 <p:commandLink id="deleteLink" update="menuTable"
                                                immediate="true"
-                                               action="#{orderPizza.deleteMenuItem()}">
+                                               action="#{orderPizza.deleteMenuItem(menuItem)}">
                                     <h:outputText value="Delete" />
-                                    <f:setPropertyActionListener value="#{menuItem}"
-                                                                 target="#{orderPizza.selectedMenuItem}" />
+<!--                                    <f:setPropertyActionListener value="#{menuItem}"
+                                                                 target="#{orderPizza.selectedMenuItem}" />-->
                                 </p:commandLink>
                             </p:column>
                         </p:dataTable>

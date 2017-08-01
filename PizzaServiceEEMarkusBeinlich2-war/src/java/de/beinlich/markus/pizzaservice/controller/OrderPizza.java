@@ -18,11 +18,19 @@ import java.util.Collection;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
+import javax.annotation.Resource;
 import javax.enterprise.context.SessionScoped;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
+import javax.inject.Inject;
 import javax.inject.Named;
+import javax.jms.JMSConnectionFactory;
+import javax.jms.JMSContext;
+import javax.jms.JMSException;
+import javax.jms.JMSProducer;
+import javax.jms.ObjectMessage;
+import javax.jms.Queue;
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -54,7 +62,11 @@ public class OrderPizza implements Serializable {
     private Boolean submitted;
     private MenuItem newMenuItem;
     private MenuItem selectedMenuItem;
-    private Boolean customerSave;
+
+    private enum OrderStatus {
+        MENU, CUSTOMER, CONFIRMATION
+    };
+    private OrderStatus orderStatus;
 
     public OrderPizza() {
 
@@ -69,6 +81,7 @@ public class OrderPizza implements Serializable {
         menu = new Menu();
         submitted = false;
         newMenuItem = new MenuItem();
+        orderStatus = OrderStatus.MENU;
     }
 
     private CustomerEjbRemote lookupCustomerEjbRemote() {
@@ -101,17 +114,45 @@ public class OrderPizza implements Serializable {
         }
     }
 
-    public void deleteMenuItem() {
-        System.out.println("delete:" + selectedMenuItem.getName());
-        menu.getMenuItems().remove(selectedMenuItem);
-        selectedMenuItem = null;
+    public void deleteMenuItem(MenuItem menuItem) {
+//        System.out.println("delete:" + selectedMenuItem.getName());
+//        menu.getMenuItems().remove(selectedMenuItem);
+        menu.getMenuItems().remove(menuItem);
+//        selectedMenuItem = null;
     }
 
     public void submitOrder() {
-        this.save();
+        this.saveJms();
         submitted = true;
         FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Vielen Dank für Ihre Bestellung", "Guten Appetit.");
         RequestContext.getCurrentInstance().showMessageInDialog(message);
+    }
+    @Inject
+    @JMSConnectionFactory("jms/myConnectionFactory")
+    private JMSContext context;
+
+    @Resource(lookup = "jms/PizzaOrderQueue")
+    Queue pizzaOrderQueue;
+
+    public void saveJms() {
+        HttpServletRequest req = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
+        order.setIpAddress(req.getLocalAddr());
+        order.setSessionId(req.getSession().getId());
+        System.out.println("OrderPizza - save");
+        System.out.println("OrderPizza.save: ip-" + order.getIpAddress() + " session: " + order.getSessionId());
+//            customer.store();
+        order.setCustomer(customer);
+        order.setOrderDate(LocalDateTime.now());
+
+        JMSProducer producer = context.createProducer();
+        ObjectMessage objectMessage = context.createObjectMessage();
+        try {
+            objectMessage.setObject(order);
+            producer.send(pizzaOrderQueue, objectMessage);
+        } catch (JMSException ex) {
+            Logger.getLogger(OrderPizza.class.getName()).log(Level.SEVERE, null, ex);
+        }
+
     }
 
     public void save() {
@@ -151,15 +192,30 @@ public class OrderPizza implements Serializable {
         }
     }
 
+    @Inject 
+    SigninController signinController;
+    
     public String startOrder() {
-        customerSave = Boolean.FALSE;
-        return "toCustomer";
+        if (customer.getEmail() == null && signinController.isLogin()) {
+            System.out.println("startOrder1");
+            this.customer = getCustomerByEmail();
+        }
+        if (customer.getEmail() == null) {
+            orderStatus = OrderStatus.CUSTOMER;
+            return "toCustomer";
+        } else {
+            orderStatus = OrderStatus.CONFIRMATION;
+            return "toConfirmation";
+        }
+
     }
 
     public String enterCustomer() {
-        System.out.println("enterCustomer2");
-        customerSave = Boolean.TRUE;
-        this.customer = getCustomerByEmail();
+        System.out.println("enterCustomer1");
+        if (customer.getEmail() == null) {
+            System.out.println("enterCustomer2");
+            this.customer = getCustomerByEmail();
+        }
         return "toCustomer";
     }
 
@@ -169,7 +225,14 @@ public class OrderPizza implements Serializable {
     }
 
     public String customerEntered() {
-        return "toConfirmation";
+        switch (orderStatus) {
+            case CONFIRMATION:
+                return "toConfirmation";
+            case MENU:
+                return "toMenu";
+            default:
+                return "toConfirmation";
+        }
     }
 
     public void setIpAndSession(HttpServletRequest req) {
@@ -230,10 +293,10 @@ public class OrderPizza implements Serializable {
 
     public Customer getCustomerByEmail() {
         HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
-        if (customer == null) {
+        if (customer.getEmail() == null) {
             customer = customerEjb.getCustomerByEmail(request.getUserPrincipal().getName());
         }
-        System.out.println("getCustomer:" + request.getUserPrincipal().getName() + " - " + customer.toString());
+        System.out.println("getCustomer:" + request.getUserPrincipal().getName() + " - " + customer.getLastName());
         return customer;
     }
 
@@ -334,12 +397,11 @@ public class OrderPizza implements Serializable {
         RequestContext.getCurrentInstance().showMessageInDialog(message);
     }
 
-    public Boolean getCustomerSave() {
-        return customerSave;
+    public OrderStatus getOrderStatus() {
+        return orderStatus;
     }
 
-    public void setCustomerSave(Boolean customerSave) {
-        this.customerSave = customerSave;
+    public void setOrderStatus(OrderStatus orderStatus) {
+        this.orderStatus = orderStatus;
     }
-
 }
