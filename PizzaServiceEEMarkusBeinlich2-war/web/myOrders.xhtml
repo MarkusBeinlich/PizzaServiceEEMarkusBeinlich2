@@ -1,0 +1,71 @@
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:h="http://xmlns.jcp.org/jsf/html">
+
+    <h:head>
+        <title>#{msg.header}</title> 
+    </h:head>
+    <h:body> 
+        <f:view contracts="#{view.locale.language}">
+            <ui:composition template="/template.xhtml">
+                <ui:define name="content">
+                    <h2>#{msg.menu}</h2> 
+
+                    <h:form>
+                        <p:dataTable value="#{orderPizza.customer.orderHeaders}" var="orderHeader">
+                            <p:column style="width:16px">
+                                <p:rowToggler />
+                            </p:column>
+                            <p:column>
+                                <f:facet name="header">
+                                    <h:outputLabel value="Bestelldatum"/>
+                                </f:facet>
+                                <h:outputText value="#{orderHeader.orderDate.toLocalDate().toString()} #{orderHeader.orderDate.toLocalTime().toString()}">
+                                </h:outputText>
+                            </p:column>
+                            <p:rowExpansion>
+                                <p:dataTable value="#{orderHeader.orderEntries}" var="orderEntry">
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputLabel value="#{msg.menuItemName}"/>
+                                        </f:facet>
+                                        <h:outputText value="#{orderEntry.name}"/>
+                                    </p:column>
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputLabel value="#{msg.menuItemDescription}"/>
+                                        </f:facet>
+                                        <h:outputText value="#{orderEntry.description}"/>
+                                    </p:column>
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputLabel value="#{msg.menuItemQuantity}"/>
+                                        </f:facet>
+                                        <h:outputText value="#{orderEntry.quantity}"/>
+                                    </p:column>
+                                    <p:column>
+                                        <f:facet name="header">
+                                            <h:outputLabel value="#{msg.menuItemPrice}"/>
+                                        </f:facet>
+                                        <h:outputText value="#{orderEntry.amount}">
+                                            <f:convertNumber type="currency" currencySymbol="€"/>
+                                        </h:outputText>
+                                        <f:facet name="footer">
+                                            <h:outputText value="#{orderHeader.amount}">
+                                                <f:convertNumber type="currency" currencySymbol="€"/>
+                                            </h:outputText>
+                                        </f:facet>
+                                    </p:column>
+
+                                </p:dataTable>
+                            </p:rowExpansion>
+                        </p:dataTable>
+
+                    </h:form>
+                </ui:define>
+            </ui:composition>
+        </f:view>
+    </h:body>
+</html>

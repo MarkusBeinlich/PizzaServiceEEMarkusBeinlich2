@@ -20,6 +20,7 @@ import java.util.logging.Logger;
 import javax.annotation.PostConstruct;
 import javax.annotation.Resource;
 import javax.enterprise.context.SessionScoped;
+import javax.enterprise.event.Observes;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.ExternalContext;
 import javax.faces.context.FacesContext;
@@ -192,14 +193,17 @@ public class OrderPizza implements Serializable {
         }
     }
 
-    @Inject 
+    @Inject
     SigninController signinController;
-    
+
+    public void listenToLogin(@Observes LoginEvent loginEvent) {
+        System.out.println("listenToLogin");
+        this.customer = getCustomerByEmail();
+        System.out.println("listenToLogin2");
+    }
+
     public String startOrder() {
-        if (customer.getEmail() == null && signinController.isLogin()) {
-            System.out.println("startOrder1");
-            this.customer = getCustomerByEmail();
-        }
+        System.out.println("startOrder");
         if (customer.getEmail() == null) {
             orderStatus = OrderStatus.CUSTOMER;
             return "toCustomer";
@@ -212,16 +216,7 @@ public class OrderPizza implements Serializable {
 
     public String enterCustomer() {
         System.out.println("enterCustomer1");
-        if (customer.getEmail() == null) {
-            System.out.println("enterCustomer2");
-            this.customer = getCustomerByEmail();
-        }
         return "toCustomer";
-    }
-
-    public String login() {
-        System.out.println("-------------------login");
-        return "toLogin";
     }
 
     public String customerEntered() {
@@ -293,8 +288,10 @@ public class OrderPizza implements Serializable {
 
     public Customer getCustomerByEmail() {
         HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
-        if (customer.getEmail() == null) {
-            customer = customerEjb.getCustomerByEmail(request.getUserPrincipal().getName());
+        Customer customerDb;
+        customerDb = customerEjb.getCustomerByEmail(request.getUserPrincipal().getName());
+        if (customerDb != null) {
+            this.customer = customerDb;
         }
         System.out.println("getCustomer:" + request.getUserPrincipal().getName() + " - " + customer.getLastName());
         return customer;

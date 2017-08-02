@@ -13,7 +13,7 @@
             <ui:composition template="/template.xhtml">
                 <ui:define name="content">
                     <h2>#{msg.confirmationCustomer}</h2>
-                    <p:link outcome="toCustomer" value="Bearbeiten" rendered="#{orderPizza.submitted}"/>
+                    <p:link outcome="toCustomer" value="Bearbeiten" rendered="#{!orderPizza.submitted}"/>
                     <p:panelGrid id="customerGrid" columns="2" layout="grid">
                         <p:outputLabel for="outFirstName" value="Vorname:" />    
                         <h:outputText  id="outFirstName" value="#{orderPizza.customer.firstName}"/> 
@@ -33,7 +33,7 @@
                     <h:form>
 
                         <h2>#{msg.confirmationOrder}</h2>
-                        <p:link outcome="toMenu" value="Bearbeiten" rendered="#{orderPizza.submitted}"/>
+                        <p:link outcome="toMenu" value="Bearbeiten" rendered="#{!orderPizza.submitted}"/>
                         <p:dataTable id="order" value="#{orderPizza.order.orderEntriesAsCollection}" var="orderEntry">
 
                             <p:column>

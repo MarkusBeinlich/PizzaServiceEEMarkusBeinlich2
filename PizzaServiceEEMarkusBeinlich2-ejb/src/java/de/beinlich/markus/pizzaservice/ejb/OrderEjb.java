@@ -36,7 +36,7 @@ public class OrderEjb implements OrderEjbRemote {
 //            EntityManager em = emf.createEntityManager();
 //            em.persist(order.getCustomer());
 //            em.persist(order.getCustomer());
-            em.persist(order);
+            em.merge(order);
 //            Customer customer;
 //            customer = order.getCustomer();
 //            em.persist(customer);

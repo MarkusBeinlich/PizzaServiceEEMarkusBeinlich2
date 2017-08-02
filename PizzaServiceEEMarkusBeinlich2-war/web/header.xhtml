@@ -19,6 +19,13 @@
                                 action="#{orderPizza.enterCustomer()}"
                                 immediate="true"
                                 ajax="false"/>
+                    <p:menuitem value="Meine Bestellungen" rendered="#{signinController.login}"
+                                outcome="toMyOrders"
+                                />
+                    <p:menuitem value="Aktuelle Bestellung" rendered="#{signinController.login}"
+                                action="#{orderPizza.customerEntered()}"
+                                immediate="true"
+                                ajax="false"/>
                     <p:separator />
                     <p:menuitem value="Quit" url="#" />
                 </p:submenu>
@@ -46,7 +53,7 @@
 
                             <f:facet name="footer">
                                 <p:commandButton value="Login" update="messages headerMenu" actionListener="#{signinController.login()}"
-                                                 oncomplete="handleLoginRequest(xhr, status, args)" >
+                                                 oncomplete="handleLoginRequest(xhr, status, args)" ajax="false">
                                 </p:commandButton>
                             </f:facet>  
                         </h:panelGrid>

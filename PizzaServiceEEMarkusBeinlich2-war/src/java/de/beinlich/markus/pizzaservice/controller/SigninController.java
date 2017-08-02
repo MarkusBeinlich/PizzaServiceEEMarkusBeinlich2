@@ -6,11 +6,14 @@
 package de.beinlich.markus.pizzaservice.controller;
 
 import de.beinlich.markus.pizzaservice.model.Customer1;
+
 import java.io.Serializable;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.enterprise.event.Event;
 import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
+import javax.inject.Inject;
 import javax.inject.Named;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -22,7 +25,7 @@ import org.primefaces.context.RequestContext;
  */
 @Named
 @javax.enterprise.context.SessionScoped
-public class SigninController implements Serializable{
+public class SigninController implements Serializable {
 
     private static final long serialVersionUID = 6839648856831788874L;
 
@@ -31,7 +34,7 @@ public class SigninController implements Serializable{
     private Boolean loggedIn;
     private String username;
 
-    public SigninController()  {
+    public SigninController() {
         this.message = "nicht eingeloggt";
         this.cust = new Customer1();
     }
@@ -58,8 +61,8 @@ public class SigninController implements Serializable{
 
     public boolean isLogin() {
         HttpServletRequest request = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
-        System.out.println("isLogin as Admin:" + request.isUserInRole("admin") + 
-                RequestContext.getCurrentInstance().getCallbackParams().get("loggedIn") );
+        System.out.println("isLogin as Admin:" + request.isUserInRole("admin")
+                + RequestContext.getCurrentInstance().getCallbackParams().get("loggedIn"));
         return request.isUserInRole("admin") || request.isUserInRole("customer");
     }
 
@@ -81,6 +84,8 @@ public class SigninController implements Serializable{
         System.out.println("gotoLogin");
         return "toLogin";
     }
+    @Inject
+    Event<LoginEvent> loginEvent;
 
     public void login() {
 
@@ -94,7 +99,9 @@ public class SigninController implements Serializable{
             request.login(cust.getEmail(), cust.getPassword());
             loggedIn = true;
             username = cust.getEmail();
+            loginEvent.fire(new LoginEvent(username));
             facesMessage = new FacesMessage(FacesMessage.SEVERITY_INFO, "Welcome", cust.getEmail());
+            
         } catch (ServletException ex) {
             Logger.getLogger(SigninController.class.getName()).log(Level.SEVERE, null, ex);
         } finally {
