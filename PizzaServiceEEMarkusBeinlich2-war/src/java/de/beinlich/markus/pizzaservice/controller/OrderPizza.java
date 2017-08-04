@@ -3,6 +3,7 @@ package de.beinlich.markus.pizzaservice.controller;
 import de.beinlich.markus.pizzaservice.ejb.CustomerEjbRemote;
 import de.beinlich.markus.pizzaservice.ejb.MenuEjbRemote;
 import de.beinlich.markus.pizzaservice.ejb.OrderEjbRemote;
+import de.beinlich.markus.pizzaservice.ejb.OrderEvent;
 import de.beinlich.markus.pizzaservice.model.Customer;
 import de.beinlich.markus.pizzaservice.model.Invoice;
 import de.beinlich.markus.pizzaservice.model.Menu;
@@ -115,6 +116,11 @@ public class OrderPizza implements Serializable {
         }
     }
 
+    // DAs geht leider nicht, da das Event ja in einer anderen JVM ausgeführt wird
+//    public void getNewOrderHeader(@Observes OrderEvent orderEvent) {
+//        System.out.println("getNewOrderHeader - OrderPizza");
+//        customer.getOrderHeaders().add(orderEvent.getOrder());
+//    }
     public void deleteMenuItem(MenuItem menuItem) {
 //        System.out.println("delete:" + selectedMenuItem.getName());
 //        menu.getMenuItems().remove(selectedMenuItem);
@@ -123,6 +129,15 @@ public class OrderPizza implements Serializable {
     }
 
     public void submitOrder() {
+        HttpServletRequest req = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
+        order.setIpAddress(req.getLocalAddr());
+        order.setSessionId(req.getSession().getId());
+        System.out.println("OrderPizza - save");
+        System.out.println("OrderPizza.save: ip-" + order.getIpAddress() + " session: " + order.getSessionId());
+//            customer.store();
+        order.setCustomer(customer);
+        order.setOrderDate(LocalDateTime.now());
+
         this.saveJms();
         submitted = true;
         FacesMessage message = new FacesMessage(FacesMessage.SEVERITY_INFO, "Vielen Dank für Ihre Bestellung", "Guten Appetit.");
@@ -136,14 +151,6 @@ public class OrderPizza implements Serializable {
     Queue pizzaOrderQueue;
 
     public void saveJms() {
-        HttpServletRequest req = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
-        order.setIpAddress(req.getLocalAddr());
-        order.setSessionId(req.getSession().getId());
-        System.out.println("OrderPizza - save");
-        System.out.println("OrderPizza.save: ip-" + order.getIpAddress() + " session: " + order.getSessionId());
-//            customer.store();
-        order.setCustomer(customer);
-        order.setOrderDate(LocalDateTime.now());
 
         JMSProducer producer = context.createProducer();
         ObjectMessage objectMessage = context.createObjectMessage();
@@ -157,16 +164,6 @@ public class OrderPizza implements Serializable {
     }
 
     public void save() {
-
-        HttpServletRequest req = (HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest();
-        order.setIpAddress(req.getLocalAddr());
-        order.setSessionId(req.getSession().getId());
-        System.out.println("OrderPizza - save");
-        System.out.println("OrderPizza.save: ip-" + order.getIpAddress() + " session: " + order.getSessionId());
-//            customer.store();
-        order.setCustomer(customer);
-        order.setOrderDate(LocalDateTime.now());
-
         orderEjb.saveOrder(order);
     }
 
@@ -292,8 +289,9 @@ public class OrderPizza implements Serializable {
         customerDb = customerEjb.getCustomerByEmail(request.getUserPrincipal().getName());
         if (customerDb != null) {
             this.customer = customerDb;
+            System.out.println("customerDb <> null");
         }
-        System.out.println("getCustomer:" + request.getUserPrincipal().getName() + " - " + customer.getLastName());
+        System.out.println("getCustomer:" + request.getUserPrincipal().getName() + " - " + customer.getLastName() + " - " + customer.getOrderHeaders().size());
         return customer;
     }
 
