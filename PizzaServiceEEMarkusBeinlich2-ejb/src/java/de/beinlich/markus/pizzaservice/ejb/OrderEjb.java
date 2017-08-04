@@ -28,7 +28,7 @@ public class OrderEjb implements OrderEjbRemote {
     private EntityManager em;
 
     @Inject
-    Event<OrderEvent> orderEvent;
+    private Event<OrderEvent> orderEvent;
 
     @Override
     public void saveOrder(OrderHeader order) {
@@ -36,7 +36,7 @@ public class OrderEjb implements OrderEjbRemote {
 //            EntityManager em = emf.createEntityManager();
 //            em.persist(order.getCustomer());
 //            em.persist(order.getCustomer());
-            em.merge(order);
+            order = em.merge(order);
 //            Customer customer;
 //            customer = order.getCustomer();
 //            em.persist(customer);
